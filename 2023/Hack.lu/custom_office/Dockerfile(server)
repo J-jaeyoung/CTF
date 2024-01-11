@@ -1,0 +1,20 @@
+FROM ubuntu
+
+ENV LANG C.UTF-8
+ENV LC_ALL C.UTF-8
+
+RUN apt update && apt install -y socat
+RUN ldd /bin/ls
+
+
+RUN useradd -u 1000 emxl
+
+COPY ./flag.txt /flag.txt
+RUN chown 1000:1000 /flag.txt
+RUN chmod 700 /flag.txt
+
+COPY ./main /main
+
+RUN chmod 555 /main
+
+CMD [ "socat", "tcp-l:1234,reuseaddr,fork", "EXEC:'/main'" ]
